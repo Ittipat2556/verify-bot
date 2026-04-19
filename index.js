@@ -1,4 +1,5 @@
 require('dotenv').config();
+
 const {
   Client,
   GatewayIntentBits,
@@ -12,7 +13,7 @@ const {
 const express = require("express");
 const app = express();
 
-// 🌐 กันหลับ (สำคัญ)
+// 🌐 กันหลับ
 app.get("/", (req, res) => {
   res.send("Bot is running");
 });
@@ -25,12 +26,29 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers]
 });
 
-// 🔴 ใส่โทเคนตรงนี้
-client.login(process.env.TOKEN);
-
 // 📌 ตอนบอทออนไลน์
-client.once(Events.ClientReady, () => {
+client.once(Events.ClientReady, async () => {
   console.log(`✅ บอทออนไลน์แล้ว`);
+
+  // 📩 ส่งปุ่ม Verify (ครั้งแรก)
+  const channel = await client.channels.fetch("1126466175128326196");
+
+  const embed = new EmbedBuilder()
+    .setTitle("🔐 VERIFY")
+    .setDescription("กดปุ่มด้านล่างเพื่อยืนยันตัวตน")
+    .setColor("Green");
+
+  const button = new ButtonBuilder()
+    .setCustomId("verify")
+    .setLabel("✅ Verify")
+    .setStyle(ButtonStyle.Success);
+
+  const row = new ActionRowBuilder().addComponents(button);
+
+  channel.send({
+    embeds: [embed],
+    components: [row]
+  });
 });
 
 // 🎯 ระบบกดปุ่ม Verify
@@ -56,26 +74,5 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
-// 📩 ส่งปุ่ม Verify (ครั้งแรก)
-client.once(Events.ClientReady, async () => {
-  const channel = await client.channels.fetch("1126466175128326196");
-
-  const embed = new EmbedBuilder()
-    .setTitle("🔐 VERIFY")
-    .setDescription("กดปุ่มด้านล่างเพื่อยืนยันตัวตน")
-    .setColor("Green");
-
-  const button = new ButtonBuilder()
-    .setCustomId("verify")
-    .setLabel("✅ Verify")
-    .setStyle(ButtonStyle.Success);
-
-  const row = new ActionRowBuilder().addComponents(button);
-
-  channel.send({
-    embeds: [embed],
-    components: [row]
-  });
-});
-
-client.login(TOKEN);
+// ✅ login แค่ครั้งเดียวพอ
+client.login(process.env.TOKEN);
