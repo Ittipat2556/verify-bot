@@ -75,4 +75,4 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 // ✅ login แค่ครั้งเดียวพอ
-client.login(process.env.TOKEN);
+c
